@@ -1,32 +1,53 @@
 import { useState } from "react";
-
+import Square from "./Square";
 const TURNS = {
   X: "X",
   O: "O",
 };
 
-const Square = ({ children, isSelected, updateBoard, index }) => {
-  const className = `square ${isSelected ? "is-selected" : ""}`;
-
-  const handleClick = () => {
-    updateBoard();
-  };
-
-  return (
-    <div className={className} onClick={handleClick}>
-      <span>{children}</span>
-    </div>
-  );
-};
+const WINNER_COMBINATIONS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [turn, setTurn] = useState(TURNS.X);
+  const [winner, setWinner] = useState(null);
 
-  const updateBoard = () => {
+  const checkWinner = (boardCheck) => {
+    for (const iterator of WINNER_COMBINATIONS) {
+      console.log("iter", iterator);
+      const [a, b, c] = iterator;
+      if (boardCheck[a] === boardCheck[b] && boardCheck[a] === boardCheck[c]) {
+        return boardCheck[a];
+      }
+    }
+    return null;
+  };
+
+  const updateBoard = (index) => {
+    if (board[index] || winner) return; //si la posicion del tablero esta ocupada no se puede hacer nada
+
+    const newBoard = [...board];
+    console.log(newBoard);
+    newBoard[index] = turn;
+    setBoard(newBoard);
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
-    console.log("updateBoard", newTurn);
+    const newWinner = checkWinner(newBoard);
+
+    if (newWinner) {
+      setWinner(newWinner);
+
+      alert(`El ganador es ${newWinner}`);
+    }
   };
 
   return (
@@ -41,6 +62,7 @@ function App() {
           );
         })}
       </section>
+
       <section className="turn">
         <Square isSelected={turn == TURNS.X}>
           <span>{TURNS.X}</span>
