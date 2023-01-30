@@ -5,8 +5,15 @@ import { checkEndGame, checkWinner } from "./logic/checks";
 import { WinnerModal } from "./components/WinnerModal";
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.X);
+  const [board, setBoard] = useState(() => {
+    const board = sessionStorage.getItem("board");
+    if (board) return JSON.parse(board);
+    return Array(9).fill(null);
+  });
+  const [turn, setTurn] = useState(() => {
+    const turn = sessionStorage.getItem("turn");
+    return turn ?? TURNS.X;
+  });
   const [winner, setWinner] = useState(null);
 
   const updateBoard = (index) => {
@@ -17,6 +24,8 @@ function App() {
     setBoard(newBoard);
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
+    sessionStorage.setItem("board", JSON.stringify(newBoard));
+    sessionStorage.setItem("turn", newTurn);
     const newWinner = checkWinner(newBoard);
 
     if (newWinner) {
@@ -30,6 +39,7 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.X);
     setWinner(null);
+    sessionStorage.clear();
   };
 
   return (
