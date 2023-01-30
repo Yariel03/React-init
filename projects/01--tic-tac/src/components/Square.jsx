@@ -1,6 +1,6 @@
 import React from "react";
 
-const Square = ({ children, isSelected, updateBoard, index }) => {
+export const Square = ({ children, isSelected, updateBoard, index }) => {
   const className = `square ${isSelected ? "is-selected" : ""}`;
 
   const handleClick = () => {
@@ -13,5 +13,3 @@ const Square = ({ children, isSelected, updateBoard, index }) => {
     </div>
   );
 };
-
-export default Square;

@@ -1,42 +1,18 @@
 import { useState } from "react";
-import Square from "./Square";
-const TURNS = {
-  X: "X",
-  O: "O",
-};
-
-const WINNER_COMBINATIONS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
+import { Square } from "./components/Square";
+import { TURNS } from "./constants";
+import { checkEndGame, checkWinner } from "./logic/checks";
+import { WinnerModal } from "./components/WinnerModal";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [turn, setTurn] = useState(TURNS.X);
   const [winner, setWinner] = useState(null);
 
-  const checkWinner = (boardCheck) => {
-    for (const iterator of WINNER_COMBINATIONS) {
-      console.log("iter", iterator);
-      const [a, b, c] = iterator;
-      if (boardCheck[a] === boardCheck[b] && boardCheck[a] === boardCheck[c]) {
-        return boardCheck[a];
-      }
-    }
-    return null;
-  };
-
   const updateBoard = (index) => {
     if (board[index] || winner) return; //si la posicion del tablero esta ocupada no se puede hacer nada
 
     const newBoard = [...board];
-    console.log(newBoard);
     newBoard[index] = turn;
     setBoard(newBoard);
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
@@ -45,13 +21,20 @@ function App() {
 
     if (newWinner) {
       setWinner(newWinner);
-
-      alert(`El ganador es ${newWinner}`);
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false);
     }
+  };
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.X);
+    setWinner(null);
   };
 
   return (
     <main className="board">
+      <button onClick={() => resetGame()}>Reiniciar</button>
       <h1>tic tac toe</h1>
       <section className="game">
         {board.map((square, index) => {
@@ -62,7 +45,6 @@ function App() {
           );
         })}
       </section>
-
       <section className="turn">
         <Square isSelected={turn == TURNS.X}>
           <span>{TURNS.X}</span>
@@ -71,6 +53,7 @@ function App() {
           <span>{TURNS.O}</span>
         </Square>
       </section>
+      <WinnerModal winner={winner} resetGame={resetGame}></WinnerModal>
     </main>
   );
 }
